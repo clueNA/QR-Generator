@@ -8,7 +8,6 @@ from datetime import datetime
 import pytz
 from PIL import Image
 import numpy as np
-from pyzbar.pyzbar import decode
 import cv2
 
 # Set up logging
@@ -55,33 +54,41 @@ def read_qr_code(image_data):
         if image.mode != 'RGB':
             image = image.convert('RGB')
         
+        # Convert PIL Image to OpenCV format
         image_np = np.array(image)
-        gray = cv2.cvtColor(image_np, cv2.COLOR_RGB2GRAY)
+        # OpenCV uses BGR but PIL uses RGB, so convert
+        image_cv = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
         
-        # Try multiple methods to read QR code
-        decoded_objects = decode(gray)
+        # Initialize QR Code detector
+        qr_detector = cv2.QRCodeDetector()
         
-        if not decoded_objects:
-            # Try with threshold
-            thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                         cv2.THRESH_BINARY, 11, 2)
-            decoded_objects = decode(thresh)
+        # Try to detect and decode QR code
+        data, bbox, _ = qr_detector.detectAndDecode(image_cv)
         
-        if not decoded_objects:
-            # Try with blur
-            blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-            thresh = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
-            decoded_objects = decode(thresh)
+        if data:
+            # Successfully detected QR code
+            return [data]
         
-        if decoded_objects:
-            results = []
-            for obj in decoded_objects:
-                try:
-                    content = obj.data.decode('utf-8')
-                except UnicodeDecodeError:
-                    content = obj.data.decode('utf-8', errors='ignore')
-                results.append(content)
-            return results
+        # If standard detection fails, try with preprocessing
+        gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
+        
+        # Try with threshold
+        thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                    cv2.THRESH_BINARY, 11, 2)
+        data, bbox, _ = qr_detector.detectAndDecode(thresh)
+        
+        if data:
+            return [data]
+        
+        # Try with blur
+        blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+        thresh = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+        data, bbox, _ = qr_detector.detectAndDecode(thresh)
+        
+        if data:
+            return [data]
+            
+        # If we get here, no QR code was detected
         return None
     except Exception as e:
         logger.error(f"Error reading QR code: {e}")
