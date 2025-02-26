@@ -35,26 +35,11 @@ An interactive web application built with Streamlit that allows users to generat
    cd QR-Generator
    ```
 
-2. **Install system dependencies**
-
-   For Ubuntu/Debian:
-   ```bash
-   sudo apt-get update
-   sudo apt-get install libzbar0
-   ```
-
-   For macOS:
-   ```bash
-   brew install zbar
-   ```
-
-   For Windows:
-   - Download and install [ZBar](https://sourceforge.net/projects/zbar/files/zbar/0.10/)
-
-3. **Install Python dependencies**
+2. **Install Python dependencies**
    ```bash
    pip install -r requirements.txt
    ```
+
 
 ## Running the Application
 
@@ -71,8 +56,7 @@ streamlit
 qrcode
 Pillow
 numpy
-opencv-python
-pyzbar
+opencv-python-headless
 pytz
 python-dateutil
 ```
