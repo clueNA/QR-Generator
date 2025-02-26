@@ -4,6 +4,9 @@
 
 An interactive web application built with Streamlit that allows users to generate, read, and manage QR codes. The application features user authentication, QR code generation, reading capabilities, and a history management system.
 
+## 🌐 Live Demo
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://qrgen-app.streamlit.app/)
+
 ## Features
 
 - **User Authentication**
