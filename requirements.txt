@@ -1,0 +1,8 @@
+streamlit
+qrcode
+Pillow
+numpy
+opencv-python
+pyzbar
+pytz
+python-dateutil
